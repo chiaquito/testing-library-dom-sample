@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>test sample</title>
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <h1>This is sample page for testing</h1>
+
+    <div style="margin: 1em; padding: 2em; background-color: #d1e6f8">
+      <p id="text1">ボタンを押すとテキストが変わります</p>
+      <button id="btn1">テキストが変わるボタン</button>
+    </div>
+
+    <script>
+      // btn1のイベント
+
+      $("#btn1").on("click", () => {
+        console.log("btn1 event fires");
+
+        const addedChar = (text) => {
+          if (text.length % 2 === 0) return "◎";
+          return "☆";
+        };
+        // イベント処理本体
+        {
+          const t = !$("#text1").text().includes("ボタン")
+            ? $("#text1").text()
+            : "";
+
+          const newText = t + addedChar(t);
+          $("#text1").text(newText);
+        }
+      });
+    </script>
+
+    <div style="margin: 1em; padding: 2em; background-color: #caf9f8">
+      <button id="btn2_1">活性と非活性が変わるボタン</button>
+      <button id="btn2_2">活性と非活性を変えるボタン</button>
+    </div>
+    <script>
+      // btn2_2のイベント
+      $("#btn2_2").on("click", () => {
+        console.log("btn2_2 event fires");
+
+        const toggleDisabled = () => {
+          return !$("#btn2_1").prop("disabled");
+        };
+
+        // イベント処理本体
+        {
+          console.log(toggleDisabled());
+          $("#btn2_1").prop("disabled", toggleDisabled());
+        }
+      });
+    </script>
+
+    <div style="margin: 1em; padding: 2em; background-color: hsl(34, 77%, 83%)">
+      <input id="address3_1" placeholder="都道府県" />
+      <input id="address3_2" placeholder="市区町村" />
+      <input id="address3_3" placeholder="町域名" />
+
+      <input
+        id="zipcode3"
+        type="number"
+        placeholder="郵便番号"
+        value="7830060"
+      />
+
+      <button id="btn3">郵便番号から地域情報を取得</button>
+    </div>
+    <script>
+      // btn3のイベント
+      $("#btn3").on("click", () => {
+        console.log("btn3 event fires");
+
+        // 郵便番号の入力値を取得する
+        const zipcode = () => {
+          const zipcode = $("#zipcode3").val();
+          if (zipcode.length !== 7) {
+            window.alert("郵便番号は7文字で入力してね");
+            return;
+          }
+          return zipcode;
+        };
+
+        // 取得したデータで各フォームを更新する
+        const updateAddress = (searchZipResponse) => {
+          console.log("updateAddress executed");
+          console.log("searchZipResponse:", searchZipResponse);
+          const resDetail = searchZipResponse.results[0];
+          $("#address3_1").val(resDetail.address1);
+          $("#address3_2").val(resDetail.address2);
+          $("#address3_3").val(resDetail.address3);
+        };
+
+        // イベント処理本体
+        {
+          if (!zipcode()) return;
+          // https://zipcloud.ibsnet.co.jp/doc/api
+          $.ajax({
+            url: "https://zipcloud.ibsnet.co.jp/api/search",
+            type: "GET",
+            data: {
+              zipcode: zipcode(),
+            },
+          }).done((data) => {
+            updateAddress(JSON.parse(data));
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
