@@ -1,0 +1,6 @@
+services:
+  server:
+    container_name: server
+    build: .
+    ports:
+      - "3000:3000"
